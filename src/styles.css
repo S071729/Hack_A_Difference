@@ -1,0 +1,103 @@
+:root{
+  --bg:#262e3c; /* page background (keep navy) */
+  --toolbar:#3c4756; /* toolbar colour requested */
+  --card:#ffffff;
+  --accent:#b39b66; /* gold/beige accent matching Street League (updated) */
+  --muted:#6b6b62;
+}
+
+/* Expert Sans regular font fallback -- place font file at src/assets/fonts/ExpertSans-Regular.woff2 */
+@font-face{
+  font-family: 'Expert Sans';
+  src: url('/src/assets/fonts/ExpertSans-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+*{box-sizing:border-box}
+.body-root,body{font-family:Inter,Segoe UI,system-ui,Arial;margin:0;background:var(--bg);color:#0f172a}
+.toolbar{display:flex;align-items:center;justify-content:space-between;padding:14px 24px;background:var(--toolbar);position:sticky;top:0;z-index:40;border-bottom:1px solid rgba(0,0,0,0.06);color:#e8e8e8}
+.logo{display:flex;align-items:center;gap:12px}
+.logo svg{width:44px;height:44px;border-radius:8px}
+.brand{font-weight:800;font-size:20px;color:#e8e8e8;letter-spacing:0.6px;font-family:'Expert Sans', 'Montserrat', Segoe UI, Arial}
+
+.street-logo-img{width:64px;height:64px;object-fit:contain;border-radius:6px}
+
+/* Login logo (larger than toolbar) */
+.login-logo{display:block;margin:0 auto 16px;width:180px;height:auto;object-fit:contain}
+
+/* Use Expert Sans for headings when available */
+h1,h2,h3,h4,h5,h6{font-family:'Expert Sans','Montserrat',Segoe UI,Arial}
+.right{display:flex;align-items:center;gap:12px}
+.nav-btn{background:var(--accent);border:0;padding:0 12px;border-radius:0;cursor:pointer;color:#262e3c;min-width:64px;font-size:14px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;height:44px}
+.nav-btn:hover{filter:brightness(.95)}
+.hamburger{display:none;border:0;background:transparent;padding:8px 10px;font-size:22px}
+.nav-menu{position:absolute;right:16px;top:64px;background:var(--card);padding:10px;border-radius:10px;box-shadow:0 10px 30px rgba(2,6,23,.12)}
+.nav-menu .nav-btn{display:block;width:100%;text-align:left;padding:12px 14px;border-radius:6px;color:inherit;background:transparent;height:auto}
+
+.container{max-width:1100px;margin:18px auto;padding:0 16px}
+.card{background:var(--card);padding:18px;border-radius:14px;box-shadow:0 6px 30px rgba(2,6,23,.06);color:#111}
+
+.login-wrap{display:flex;min-height:72vh;align-items:center;justify-content:center}
+.login-card{width:100%;max-width:480px;padding:24px;border-radius:14px;background:linear-gradient(180deg,#fff 0%, #fbfdff 100%);box-shadow:0 12px 40px rgba(2,6,23,.06)}
+.login-card h2{text-align:center;margin-top:8px}
+.field{display:flex;flex-direction:column;margin-bottom:12px}
+.field input{padding:12px;border:1px solid #e6e9ee;border-radius:10px}
+.btn{padding:8px 12px;border-radius:8px;border:0;cursor:pointer}
+.btn.primary{background:var(--accent);color:#fff}
+.muted{color:#bfc4c7;font-size:13px}
+.error{color:#b91c1c}
+
+.calendar{overflow:auto;margin-top:8px}
+.calendar table{width:100%;border-collapse:collapse}
+.calendar th,.calendar td{padding:12px;border:1px solid #eef2ff;text-align:center;vertical-align:top}
+.time-col{font-weight:600;color:var(--muted);width:200px}
+.slot{padding:10px;border-radius:10px}
+.slot.break{background:#fff6f6;color:#9b1c1c}
+.slot.active{background:#f7fbf5;color:#16653a}
+.slot.normal{background:#fbfaf8;color:#222}
+.slot.selected{box-shadow:0 8px 30px rgba(99,102,241,.12);transform:translateY(-3px)}
+
+.save-area{display:flex;justify-content:flex-end;margin-top:12px}
+.save-btn{background:var(--accent);color:#fff;padding:10px 18px;border-radius:999px;border:0;cursor:pointer;transition:box-shadow .12s ease,transform .06s}
+.save-btn:hover{box-shadow:0 0 0 10px rgba(179,155,102,.10);transform:translateY(-2px)}
+
+.lessons{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;margin-top:18px}
+.lesson-card{min-width:220px;flex:0 0 auto;padding:14px;border-radius:12px;background:linear-gradient(180deg,#fff 0%, #fbfdff 100%);cursor:pointer;border:1px solid rgba(2,6,23,.04);box-shadow:0 8px 30px rgba(2,6,23,.04);display:flex;flex-direction:column;align-items:center;justify-content:center;aspect-ratio:1/1}
+.lesson-card .box{flex:1;padding:8px;background:transparent;border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.lesson-card .lesson-title{font-weight:700;text-align:center;font-size:16px}
+.lesson-card .muted{margin-top:8px;text-align:center}
+
+.course-icon{width:48px;height:48px;border-radius:10px;background:linear-gradient(180deg,#efe6cf,#e0cfa0);display:flex;align-items:center;justify-content:center;font-weight:800;color:#6b4b1b;margin-bottom:10px}
+.lessons-carousel{display:flex;gap:16px;overflow-x:auto;scroll-behavior:smooth;padding:6px}
+.carousel-arrow{background:var(--card);border:1px solid rgba(2,6,23,.06);padding:8px 12px;border-radius:8px;cursor:pointer}
+.carousel-arrow:hover{box-shadow:0 6px 20px rgba(2,6,23,.08)}
+.small{font-size:12px}
+
+.users-list{display:grid;gap:8px}
+.user-row{display:flex;align-items:center;justify-content:space-between;padding:10px;background:#fff;border-radius:10px;border:1px solid rgba(2,6,23,.04)}
+
+.lessondetail{position:fixed;right:18px;bottom:18px;background:#fff;padding:16px;border-radius:12px;box-shadow:0 20px 60px rgba(2,6,23,.12);max-width:360px}
+
+@media (max-width:800px){
+  .right{display:none}
+  .hamburger{display:block}
+}
+
+/* Modal */
+.modal-overlay{position:fixed;inset:0;background:rgba(2,6,23,0.45);display:flex;align-items:center;justify-content:center;z-index:80}
+.modal{background:var(--card);padding:18px;border-radius:12px;max-width:520px;width:95%;box-shadow:0 30px 80px rgba(2,6,23,.18)}
+
+/* assigned lesson inside calendar slot */
+.assigned{margin-top:8px;padding:6px;border-radius:8px;background:linear-gradient(180deg,#fffaf0,#efe6cf);font-weight:700;color:#6b4b1b}
+
+.delete-assigned{background:transparent;border:0;color:#7a3f3f;font-weight:700;cursor:pointer;padding:4px;border-radius:6px}
+.delete-assigned:hover{background:rgba(0,0,0,0.04)}
+
+/* tight horizontal rule near total hours */
+.total-sep{border:0;height:1px;background:linear-gradient(90deg,rgba(0,0,0,0.04),rgba(0,0,0,0.02));margin:10px 0 6px}
+
+/* login notice */
+.login-notice{margin-top:10px;padding:10px;border-radius:8px;background:#fff6e6;border:1px solid rgba(179,155,102,0.35);color:#6b4b1b}
+
+
