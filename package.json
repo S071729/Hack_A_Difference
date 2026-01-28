@@ -2,6 +2,19 @@
   "name": "admin-calendar-react",
   "version": "0.1.0",
   "private": true,
+  "description": "This is a React + Vite front-end app implementing:",
+  "homepage": "https://github.com/S071729/Hack_A_Difference#readme",
+  "bugs": {
+    "url": "https://github.com/S071729/Hack_A_Difference/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/S071729/Hack_A_Difference.git"
+  },
+  "license": "ISC",
+  "author": "",
+  "type": "commonjs",
+  "main": "index.js",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
@@ -12,6 +25,7 @@
     "react-dom": "^18.2.0"
   },
   "devDependencies": {
+    "@vitejs/plugin-react": "^4.0.0",
     "vite": "^5.0.0"
   }
 }

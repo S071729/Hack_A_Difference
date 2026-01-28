@@ -6,10 +6,7 @@ import Users from './components/Users'
 import CourseDetail from './components/CourseDetail'
 import CreateScheme from './components/CreateScheme'
 
-const CREDENTIALS = [
-  {email:'admin@example.com',password:'admin123',role:'admin',name:'Admin User'},
-  {email:'user@example.com',password:'user123',role:'user',name:'Normal User'}
-]
+const API_LOGIN_URL = '/api/login'
 
 export default function App(){
   const [user,setUser] = useState(null)
@@ -38,14 +35,27 @@ export default function App(){
     if(!location.hash) location.hash = '#login'
   },[])
 
-  function login(email,password){
-    const found = CREDENTIALS.find(c=>c.email===email && c.password===password)
-    if(!found) return {ok:false, message:'Invalid credentials'}
-    setUser({name:found.name,email:found.email,role:found.role})
-    setLoginNotice('')
-    // navigate to Create Scheme immediately after login
-    location.hash = '#create-scheme'
-    return {ok:true}
+  async function login(email,password){
+    try {
+      const response = await fetch(API_LOGIN_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username: email, password })
+      })
+      const data = await response.json()
+      console.log('Login response:', data, 'Status:', response.status)
+      if(!response.ok || !data.success) {
+        return {ok:false, message:data.message || 'Invalid credentials'}
+      }
+      setUser({name:email,email:email,role:data.role})
+      setLoginNotice('')
+      // navigate to Create Scheme immediately after login
+      location.hash = '#create-scheme'
+      return {ok:true}
+    } catch (error) {
+      console.error('Login error:', error)
+      return {ok:false, message:'Login failed: ' + error.message}
+    }
   }
 
   function signout(){
