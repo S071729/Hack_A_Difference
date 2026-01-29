@@ -50,10 +50,11 @@ export default function App(){
       // Transform API response to match component expectations
       const transformedLessons = Array.isArray(data) ? data : [data]
       transformedLessons.forEach((lesson, idx) => {
-        lesson.id = lesson.lesson_plan_id || idx + 1
+        lesson.id = parseInt(lesson.lesson_plan_id) || idx + 1
         lesson.title = lesson.lesson_title
         lesson.theme_name = lesson.theme_name || ''
         lesson.theme_description = lesson.theme_description || ''
+        lesson.theme_category = lesson.theme_category || ''
       })
       
       setApiLessons(transformedLessons)
