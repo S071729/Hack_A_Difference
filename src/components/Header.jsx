@@ -10,7 +10,7 @@ export default function Header({user,onSignout,notifications=[]}){
   return (
     <header className="toolbar">
       <div className="left">
-        <div className="logo">
+        <div className="logo" onClick={()=>user ? window.location.hash='#home' : null} style={{cursor: user ? 'pointer' : 'default'}}>
           <img className="street-logo-img" src={logoSrc} alt="Street League" onError={(e)=>{
               // try local file next, then embedded fallback
               if(logoSrc !== localPath){
