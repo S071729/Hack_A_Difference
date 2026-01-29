@@ -7,6 +7,7 @@ import CourseDetail from './components/CourseDetail'
 import CreateScheme from './components/CreateScheme'
 
 const API_LOGIN_URL = '/api/login'
+const API_LESSONS_URL = '/api/lessons'
 
 export default function App(){
   const [user,setUser] = useState(null)
@@ -15,6 +16,8 @@ export default function App(){
   // allow preloading a scheme (meta) into the Dashboard so it can generate the calendar
   const [preloadedScheme,setPreloadedScheme] = useState(null)
   const [preloadedWeeks,setPreloadedWeeks] = useState(null)
+  const [apiLessons,setApiLessons] = useState(null)
+  const [apiLessonsLoading,setApiLessonsLoading] = useState(false)
 
   // a small lessons catalog shared between create-scheme and dashboard
   const LESSONS = [
@@ -24,6 +27,43 @@ export default function App(){
     {id:4,title:'English Lit',courses:['Poetry','Prose']},
     {id:5,title:'Art & Design',courses:['Drawing','Color Theory']}
   ]
+
+  // Fetch API lessons on mount
+  useEffect(()=>{
+    fetchApiLessons()
+  },[])
+
+  async function fetchApiLessons(){
+    setApiLessonsLoading(true)
+    try {
+      const response = await fetch(API_LESSONS_URL)
+      const text = await response.text()
+      console.log('Lessons API response status:', response.status)
+      console.log('Lessons API response:', text)
+      
+      if(!response.ok) {
+        throw new Error(`API Error ${response.status}: ${text}`)
+      }
+      
+      const data = JSON.parse(text)
+      
+      // Transform API response to match component expectations
+      const transformedLessons = Array.isArray(data) ? data : [data]
+      transformedLessons.forEach((lesson, idx) => {
+        lesson.id = lesson.lesson_plan_id || idx + 1
+        lesson.title = lesson.lesson_title
+        lesson.theme_name = lesson.theme_name || ''
+        lesson.theme_description = lesson.theme_description || ''
+      })
+      
+      setApiLessons(transformedLessons)
+    } catch (error) {
+      console.error('Failed to fetch API lessons:', error)
+      setApiLessons(null)
+    } finally {
+      setApiLessonsLoading(false)
+    }
+  }
 
   useEffect(()=>{
     const onHash = ()=>setRoute(location.hash.replace('#','') || (user? 'dashboard':'login'))
@@ -47,7 +87,7 @@ export default function App(){
       if(!response.ok || !data.success) {
         return {ok:false, message:data.message || 'Invalid credentials'}
       }
-      setUser({name:email,email:email,role:data.role})
+      setUser({name:data.name,email:email,role:data.role})
       setLoginNotice('')
       // navigate to Create Scheme immediately after login
       location.hash = '#create-scheme'
@@ -73,8 +113,8 @@ export default function App(){
       <Header user={user} onSignout={signout} />
 
       {route==='login' && <Login onLogin={login} notice={loginNotice} clearNotice={()=>setLoginNotice('')} />}
-      {route==='create-scheme' && <CreateScheme lessons={LESSONS} onCreate={(schemeMeta,weeks)=>{ setPreloadedScheme(schemeMeta); setPreloadedWeeks(weeks); location.hash='#dashboard' }} />}
-      {route==='dashboard' && <Dashboard user={user} lessons={LESSONS} preloadedScheme={preloadedScheme} weeksCount={preloadedWeeks} />}
+      {route==='create-scheme' && <CreateScheme lessons={apiLessons} onCreate={(schemeMeta,weeks)=>{ setPreloadedScheme(schemeMeta); setPreloadedWeeks(weeks); location.hash='#dashboard' }} />}
+      {route==='dashboard' && <Dashboard user={user} lessons={apiLessons} preloadedScheme={preloadedScheme} weeksCount={preloadedWeeks} />}
       {route==='users' && <Users user={user} />}
       {route.startsWith('course-') && <CourseDetail />}
     </div>

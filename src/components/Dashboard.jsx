@@ -1,15 +1,14 @@
 import React, {useState, useRef, useEffect} from 'react'
 
-const defaultLessons = [
-  {id:1,title:'Math Basics',courses:['Algebra','Numbers']},
-  {id:2,title:'Science Intro',courses:['Biology','Chemistry']},
-  {id:3,title:'History 101',courses:['Ancient','Modern']},
-  {id:4,title:'English Lit',courses:['Poetry','Prose']},
-  {id:5,title:'Art & Design',courses:['Drawing','Color Theory']}
-]
-
 export default function Dashboard({user, lessons: externalLessons = null, preloadedScheme = null, weeksCount = null}){
-  const [lessons] = useState(externalLessons && externalLessons.length ? externalLessons : defaultLessons)
+  const [lessons,setLessons] = useState(externalLessons || [])
+  
+  // Update lessons when externalLessons changes
+  useEffect(()=>{
+    if(externalLessons) {
+      setLessons(externalLessons)
+    }
+  },[externalLessons])
   // additional activities (not part of recommended lessons)
   const additionalActivities = [
     {id:101,title:'Football'},
@@ -287,7 +286,7 @@ export default function Dashboard({user, lessons: externalLessons = null, preloa
               <div key={l.id} className="lesson-card" onClick={()=>setSelectedLesson(l)} draggable onDragStart={(e)=>onDragStart(e,l.id)}>
                 <div className="course-icon">{l.title.split(' ').map(w=>w[0]).slice(0,2).join('')}</div>
                 <div className="lesson-title">{l.title}</div>
-                <div className="muted small">{l.courses.join(', ')}</div>
+                <div className="muted small">{[l.theme_name, l.theme_description].filter(Boolean).join(' - ')}</div>
               </div>
             ))}
           </div>
@@ -299,7 +298,7 @@ export default function Dashboard({user, lessons: externalLessons = null, preloa
         <div className="modal-overlay" onClick={()=>setSelectedLesson(null)}>
           <div className="modal" onClick={(e)=>e.stopPropagation()}>
             <h3 style={{textAlign:'center',fontWeight:800}}>{selectedLesson.title}</h3>
-            <p style={{lineHeight:1.6}}>{selectedLesson.courses.join(', ')}</p>
+            <p style={{lineHeight:1.6}}>{[selectedLesson.theme_name, selectedLesson.theme_description].filter(Boolean).join(' - ')}</p>
             <div style={{marginTop:12}}>
               <label className="muted">Week</label>
               <select id="weekSelect" defaultValue={currentWeek} style={{width:'100%',padding:8,borderRadius:8,marginTop:6}}>
