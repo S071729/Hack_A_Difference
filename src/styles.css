@@ -109,4 +109,21 @@ label.muted{display:block;margin-bottom:6px;color:var(--muted);font-size:13px}
 /* login notice */
 .login-notice{margin-top:10px;padding:10px;border-radius:8px;background:#fff6e6;border:1px solid rgba(179,155,102,0.35);color:#6b4b1b}
 
+/* Notifications UI */
+.notif-bell{font-size:18px;line-height:1}
+.notif-badge{display:inline-block;min-width:20px;height:20px;padding:0 6px;background:#e11d48;color:#fff;border-radius:999px;font-size:12px;font-weight:700;margin-left:8px;vertical-align:top}
+.notifications-page{max-width:1100px;margin:18px auto;padding:12px;background:#e8e8e8;border-radius:8px}
+.notif-list{display:flex;flex-direction:column;gap:10px;margin-bottom:18px}
+.notif-item{background:#e8e8e8;padding:12px;border-radius:10px;border:1px solid rgba(2,6,23,.04);color:#111}
+.notif-title{font-weight:800}
+.notif-meta{font-size:12px;color:var(--muted);margin-top:6px}
+.notif-body{margin-top:8px}
+.blocks-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-top:16px}
+.block{background:linear-gradient(180deg,#fff 0%, #fbfdff 100%);padding:18px;border-radius:12px;cursor:pointer;border:1px solid rgba(2,6,23,.04);display:flex;align-items:center;justify-content:center;min-height:120px}
+.block-title{font-weight:800;text-align:center}
+.modal-backdrop{position:fixed;inset:0;background:rgba(2,6,23,0.45);display:flex;align-items:center;justify-content:center;z-index:120}
+.modal{background:var(--card);padding:18px;border-radius:12px;max-width:520px;width:95%;box-shadow:0 30px 80px rgba(2,6,23,.18)}
+.approval-detail{display:flex;flex-direction:column;gap:8px;margin-top:8px}
+.modal-actions{display:flex;justify-content:flex-end;margin-top:12px}
+
 

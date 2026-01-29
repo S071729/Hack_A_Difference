@@ -1,6 +1,6 @@
 import React, {useState} from 'react'
 
-export default function Header({user,onSignout}){
+export default function Header({user,onSignout,notifications=[]}){
   const [open,setOpen] = useState(false)
   // use the workspace-root logo file (served by Vite at root)
   const projectLogo = '/Street%20League%20Rebrand%20Logo.jpg'
@@ -30,6 +30,12 @@ export default function Header({user,onSignout}){
             <button className="nav-btn" onClick={()=>location.hash='#dashboard'}>Profile</button>
             <button className="nav-btn" onClick={()=>location.hash='#create-scheme'}>Create Scheme</button>
             {user && user.role==='admin' && <button className="nav-btn" onClick={()=>location.hash='#users'}>Users</button>}
+            <button className="nav-btn" onClick={()=>location.hash='#notifications'} title="Notifications" aria-label="Notifications">
+              <span className="notif-bell">🔔</span>
+              {notifications && notifications.length>0 && (
+                <span className="notif-badge">{notifications.length}</span>
+              )}
+            </button>
             <button className="nav-btn" onClick={onSignout}>Sign out</button>
           </nav>
           <button className="hamburger" onClick={()=>setOpen(!open)}>☰</button>
@@ -37,6 +43,7 @@ export default function Header({user,onSignout}){
             <div className="nav-menu">
               <button className="nav-btn" onClick={()=>{location.hash='#dashboard'; setOpen(false)}}>Profile</button>
               {user && user.role==='admin' && <button className="nav-btn" onClick={()=>{location.hash='#users'; setOpen(false)}}>Users</button>}
+              <button className="nav-btn" onClick={()=>{location.hash='#notifications'; setOpen(false)}}>Notifications {notifications && notifications.length>0 ? `(${notifications.length})` : ''}</button>
               <button className="nav-btn" onClick={()=>{onSignout(); setOpen(false)}}>Sign out</button>
             </div>
           )}
