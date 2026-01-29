@@ -125,7 +125,7 @@ export default function App(){
       {route==='dashboard' && <Dashboard user={user} lessons={apiLessons} preloadedScheme={preloadedScheme} weeksCount={preloadedWeeks} myLessons={myLessons} />}
       {route==='lesson-library' && <LessonLibrary lessons={apiLessons} myLessons={myLessons} setMyLessons={setMyLessons} />}
       {route==='users' && <Users user={user} />}
-      {route==='notifications' && <Notifications notifications={notifications} />}
+      {route==='notifications' && <Notifications notifications={notifications} user={user} />}
       {route.startsWith('course-') && <CourseDetail />}
     </div>
   )

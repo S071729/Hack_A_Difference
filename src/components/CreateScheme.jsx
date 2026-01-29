@@ -29,7 +29,7 @@ export default function CreateScheme({lessons = [], onCreate}){
         <h2 style={{textAlign:'center',marginBottom:6}}>Create Scheme of Work</h2>
         <form onSubmit={handleSubmit}>
           <label className="field">
-            <span>Scheme</span>
+            <span>Academic Type</span>
             <select value={scheme} onChange={e=>setScheme(e.target.value)} style={{padding:10,borderRadius:8}}>
               {schemeOptions.map(s=> <option key={s.value} value={s.value}>{s.label}</option>)}
             </select>
