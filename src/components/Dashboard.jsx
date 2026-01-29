@@ -135,10 +135,39 @@ export default function Dashboard({user, lessons: externalLessons = null, preloa
           <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:10}}>
             <div style={{display:'flex',alignItems:'center',gap:8}}>
               <button className="carousel-arrow" onClick={prevWeek}>◀</button>
-              <div style={{fontWeight:700}}>Week {currentWeek}</div>
               <button className="carousel-arrow" onClick={nextWeek}>▶</button>
             </div>
-            <div className="muted">Showing week {currentWeek} of {WEEKS}</div>
+            <div style={{flex:1,textAlign:'center',fontWeight:700}}>Week {currentWeek}</div>
+            <div style={{display:'flex',alignItems:'center',gap:8}}>
+              <div className="muted">Showing week {currentWeek} of {WEEKS}</div>
+              <button className="btn" onClick={()=>{
+                // build a printable view for current week
+                const dayNames = ['Monday','Tuesday','Wednesday','Thursday','Friday']
+                let html = `<html><head><title>Week ${currentWeek} - Schedule</title><style>body{font-family:Arial;padding:16px}table{border-collapse:collapse;width:100%}th,td{border:1px solid #ccc;padding:8px;text-align:left}</style></head><body>`
+                html += `<h2>Week ${currentWeek} Schedule</h2>`
+                html += '<table><thead><tr><th>Time</th>' + dayNames.map(d=>`<th>${d}</th>`).join('') + '</tr></thead><tbody>'
+                slots.forEach((s,ri)=>{
+                  html += `<tr><td>${s.label}</td>`
+                  for(let c=0;c<5;c++){
+                    const key = `${currentWeek}-${c}-${ri}`
+                    const id = assignments[key]
+                    const title = id ? (combinedCatalog.find(x=> x.id === id)?.title || 'Assigned') : (s.type==='break' ? 'Break' : (s.type==='active'?'Active Hour':'Available'))
+                    html += `<td>${title}</td>`
+                  }
+                  html += `</tr>`
+                })
+                html += '</tbody></table>'
+                html += '</body></html>'
+                const w = window.open('','_blank')
+                if(!w){ alert('Popup blocked - allow popups to download PDF via print dialog') ; return }
+                w.document.open()
+                w.document.write(html)
+                w.document.close()
+                w.focus()
+                // delay to allow rendering
+                setTimeout(()=> w.print(), 500)
+              }}>Download as PDF</button>
+            </div>
           </div>
           <table>
             <thead>
@@ -186,39 +215,11 @@ export default function Dashboard({user, lessons: externalLessons = null, preloa
             </tbody>
           </table>
 
-          {/* download control for the current week */}
-          <div style={{display:'flex',justifyContent:'flex-end',gap:8,marginTop:8}}>
-            <button className="btn" onClick={()=>{
-              // build a printable view for current week
-              const dayNames = ['Monday','Tuesday','Wednesday','Thursday','Friday']
-              let html = `<html><head><title>Week ${currentWeek} - Schedule</title><style>body{font-family:Arial;padding:16px}table{border-collapse:collapse;width:100%}th,td{border:1px solid #ccc;padding:8px;text-align:left}</style></head><body>`
-              html += `<h2>Week ${currentWeek} Schedule</h2>`
-              html += '<table><thead><tr><th>Time</th>' + dayNames.map(d=>`<th>${d}</th>`).join('') + '</tr></thead><tbody>'
-              slots.forEach((s,ri)=>{
-                html += `<tr><td>${s.label}</td>`
-                for(let c=0;c<5;c++){
-                  const key = `${currentWeek}-${c}-${ri}`
-                  const id = assignments[key]
-                  const title = id ? (combinedCatalog.find(x=> x.id === id)?.title || 'Assigned') : (s.type==='break' ? 'Break' : (s.type==='active'?'Active Hour':'Available'))
-                  html += `<td>${title}</td>`
-                }
-                html += `</tr>`
-              })
-              html += '</tbody></table>'
-              html += '</body></html>'
-              const w = window.open('','_blank')
-              if(!w){ alert('Popup blocked - allow popups to download PDF via print dialog') ; return }
-              w.document.open()
-              w.document.write(html)
-              w.document.close()
-              w.focus()
-              // delay to allow rendering
-              setTimeout(()=> w.print(), 500)
-            }}>Download as PDF</button>
-          </div>
+          {/* single Download as PDF button kept in calendar header (top-right) */}
 
             <div className="save-area">
-              <button className="save-btn">Save</button>
+              <button className="save-btn">Save as draft</button>
+              <button className="send-btn" onClick={()=>{ alert('Sent for approval') }}>Send for approval</button>
             </div>
             <hr className="total-sep" />
             <div style={{display:'flex',flexDirection:'column',gap:10,marginTop:6}}>
