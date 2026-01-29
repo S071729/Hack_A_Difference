@@ -28,6 +28,7 @@ export default function Header({user,onSignout,notifications=[]}){
         <>
           <nav className="right">
             <button className="nav-btn" onClick={()=>location.hash='#dashboard'}>Profile</button>
+            <button className="nav-btn" onClick={()=>location.hash='#lesson-library'}>Lesson Library</button>
             <button className="nav-btn" onClick={()=>location.hash='#create-scheme'}>Create Scheme</button>
             {user && user.role==='admin' && <button className="nav-btn" onClick={()=>location.hash='#users'}>Users</button>}
             <button className="nav-btn" onClick={()=>location.hash='#notifications'} title="Notifications" aria-label="Notifications">
@@ -42,6 +43,8 @@ export default function Header({user,onSignout,notifications=[]}){
           {open && (
             <div className="nav-menu">
               <button className="nav-btn" onClick={()=>{location.hash='#dashboard'; setOpen(false)}}>Profile</button>
+              <button className="nav-btn" onClick={()=>{location.hash='#lesson-library'; setOpen(false)}}>Lesson Library</button>
+              <button className="nav-btn" onClick={()=>{location.hash='#create-scheme'; setOpen(false)}}>Create Scheme</button>
               {user && user.role==='admin' && <button className="nav-btn" onClick={()=>{location.hash='#users'; setOpen(false)}}>Users</button>}
               <button className="nav-btn" onClick={()=>{location.hash='#notifications'; setOpen(false)}}>Notifications {notifications && notifications.length>0 ? `(${notifications.length})` : ''}</button>
               <button className="nav-btn" onClick={()=>{onSignout(); setOpen(false)}}>Sign out</button>

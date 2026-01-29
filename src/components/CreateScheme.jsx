@@ -63,7 +63,10 @@ export default function CreateScheme({lessons = [], onCreate}){
 
           {/* Total hours and accredited hours are configured below the calendar in the Dashboard */}
 
-          <div style={{display:'flex',justifyContent:'center',marginTop:12}}>
+          <div style={{display:'flex',justifyContent:'space-between',marginTop:20,gap:12}}>
+            <button className="btn" type="button" onClick={()=>window.location.hash='#lesson-library'}>
+              Lesson Library
+            </button>
             <button className="btn primary" type="submit">Create</button>
           </div>
         </form>

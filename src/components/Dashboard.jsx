@@ -3,7 +3,7 @@ import SearchFilter from './SearchFilter'
 import LessonCard from './LessonCard'
 import ActivityCard from './ActivityCard'
 
-export default function Dashboard({user, lessons: externalLessons = null, preloadedScheme = null, weeksCount = null}){
+export default function Dashboard({user, lessons: externalLessons = null, preloadedScheme = null, weeksCount = null, myLessons = []}){
   const [lessons,setLessons] = useState(externalLessons || [])
   
   // Update lessons when externalLessons changes
@@ -12,6 +12,60 @@ export default function Dashboard({user, lessons: externalLessons = null, preloa
       setLessons(externalLessons)
     }
   },[externalLessons])
+
+  // Auto-scroll when dragging near edges
+  useEffect(() => {
+    let scrollInterval = null
+    
+    const handleDragOver = (e) => {
+      const scrollThreshold = 100
+      const scrollSpeed = 10
+      const viewportHeight = window.innerHeight
+      const mouseY = e.clientY
+      
+      if (mouseY < scrollThreshold) {
+        // Near top - scroll up
+        if (!scrollInterval) {
+          scrollInterval = setInterval(() => {
+            window.scrollBy(0, -scrollSpeed)
+          }, 16)
+        }
+      } else if (mouseY > viewportHeight - scrollThreshold) {
+        // Near bottom - scroll down
+        if (!scrollInterval) {
+          scrollInterval = setInterval(() => {
+            window.scrollBy(0, scrollSpeed)
+          }, 16)
+        }
+      } else {
+        // Not near edges - stop scrolling
+        if (scrollInterval) {
+          clearInterval(scrollInterval)
+          scrollInterval = null
+        }
+      }
+    }
+    
+    const handleDragEnd = () => {
+      if (scrollInterval) {
+        clearInterval(scrollInterval)
+        scrollInterval = null
+      }
+    }
+    
+    document.addEventListener('dragover', handleDragOver)
+    document.addEventListener('dragend', handleDragEnd)
+    document.addEventListener('drop', handleDragEnd)
+    
+    return () => {
+      document.removeEventListener('dragover', handleDragOver)
+      document.removeEventListener('dragend', handleDragEnd)
+      document.removeEventListener('drop', handleDragEnd)
+      if (scrollInterval) {
+        clearInterval(scrollInterval)
+      }
+    }
+  }, [])
   
   // Calculate the starting ID for additional activities (after the max lesson ID)
   const maxLessonId = lessons.length > 0 ? Math.max(...lessons.map(l => l.id)) : 0
@@ -36,6 +90,7 @@ export default function Dashboard({user, lessons: externalLessons = null, preloa
   const [searchTerm,setSearchTerm] = useState('')
   const combinedCatalog = [...lessons, ...additionalActivities]
   const [selectedLesson,setSelectedLesson] = useState(null)
+  const [isModalReadOnly,setIsModalReadOnly] = useState(false)
   const carouselRef = useRef(null)
   const WEEKS = weeksCount || 10
   const [currentWeek,setCurrentWeek] = useState(1)
@@ -118,19 +173,36 @@ export default function Dashboard({user, lessons: externalLessons = null, preloa
     return out
   }
 
-  function onDragStart(e, lessonId){
+  function onDragStart(e, lessonId, sourceKey = null){
     e.dataTransfer.setData('text/plain', String(lessonId))
+    if(sourceKey){
+      e.dataTransfer.setData('sourceKey', sourceKey)
+    }
   }
 
   function onSlotDrop(e, day, slot){
     e.preventDefault()
     const lessonId = e.dataTransfer.getData('text/plain')
+    const sourceKey = e.dataTransfer.getData('sourceKey')
     if(!lessonId) return
     if(slots[slot].type==='break'){
       alert('Cannot drop into Break slot')
       return
     }
-    addToCalendar(currentWeek, day, slot, Number(lessonId))
+    const targetKey = `${currentWeek}-${day}-${slot}`
+    
+    // If moving from another calendar slot, remove from source
+    if(sourceKey && sourceKey !== targetKey){
+      setAssignments(a=>{
+        const na = {...a}
+        delete na[sourceKey]
+        na[targetKey] = Number(lessonId)
+        return na
+      })
+    } else if(!sourceKey || sourceKey === targetKey){
+      // Adding from carousel or dropping in same spot
+      addToCalendar(currentWeek, day, slot, Number(lessonId))
+    }
   }
 
   function onSlotDragOver(e){ e.preventDefault() }
@@ -204,11 +276,25 @@ export default function Dashboard({user, lessons: externalLessons = null, preloa
                         {/* show assigned lesson for this week/day/slot if present */}
                         {assignments[`${currentWeek}-${c}-${ri}`] ? (
                           <div className="assigned" draggable onDragStart={(e)=>{
-                            const id = assignments[`${currentWeek}-${c}-${ri}`]
-                            e.dataTransfer.setData('text/plain', String(id))
+                            const key = `${currentWeek}-${c}-${ri}`
+                            const id = assignments[key]
+                            onDragStart(e, id, key)
                           }}>
                             <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',gap:8}}>
-                              <div style={{flex:1}}>{(function(){ const id = assignments[`${currentWeek}-${c}-${ri}`]; const found = combinedCatalog.find(x=> x.id === id); return found?.lesson_title || found?.title || 'Assigned' })()}</div>
+                              <div 
+                                style={{flex:1,cursor:'pointer'}} 
+                                onClick={(ev)=>{
+                                  ev.stopPropagation()
+                                  const id = assignments[`${currentWeek}-${c}-${ri}`]
+                                  const found = combinedCatalog.find(x=> x.id === id)
+                                  if(found) {
+                                    setSelectedLesson(found)
+                                    setIsModalReadOnly(true)
+                                  }
+                                }}
+                              >
+                                {(function(){ const id = assignments[`${currentWeek}-${c}-${ri}`]; const found = combinedCatalog.find(x=> x.id === id); return found?.lesson_title || found?.title || 'Assigned' })()}
+                              </div>
                               <button className="delete-assigned" onClick={(ev)=>{ ev.stopPropagation(); const key = `${currentWeek}-${c}-${ri}`; setAssignments(a=>{ const na = {...a}; delete na[key]; return na }) }}>✕</button>
                             </div>
                           </div>
@@ -291,13 +377,55 @@ export default function Dashboard({user, lessons: externalLessons = null, preloa
                 <LessonCard 
                   key={l.id} 
                   lesson={l} 
-                  onClick={()=>setSelectedLesson(l)} 
+                  onClick={()=>{
+                    setSelectedLesson(l)
+                    setIsModalReadOnly(false)
+                  }} 
                   draggable 
                   onDragStart={(e)=>onDragStart(e,l.id)}
                 />
               ))}
             </div>
             <button className="carousel-arrow" onClick={()=>scrollLessons('right')}>▶</button>
+          </div>
+          
+          <div style={{display:'flex',justifyContent:'center',marginTop:16}}>
+            <button className="btn primary" onClick={()=>location.hash='#lesson-library'}>
+              View All Lesson Plans
+            </button>
+          </div>
+        </div>
+
+        {/* My Lessons carousel */}
+        <div style={{marginTop:18}}>
+          <h4 style={{marginBottom:8}}>Saved Lesson Plans</h4>
+          
+          <div className="lessons-carousel">
+            {myLessons.length > 0 ? (
+              myLessons.map(l=> (
+                <LessonCard 
+                  key={l.id} 
+                  lesson={l} 
+                  onClick={()=>{
+                    setSelectedLesson(l)
+                    setIsModalReadOnly(false)
+                  }} 
+                  draggable 
+                  onDragStart={(e)=>onDragStart(e,l.id)}
+                />
+              ))
+            ) : (
+              <div style={{
+                padding: 40,
+                textAlign: 'center',
+                color: '#999',
+                backgroundColor: '#fafafa',
+                borderRadius: 8,
+                border: '1px dashed #ddd'
+              }}>
+                Add Lesson plans from the Lesson Library.
+              </div>
+            )}
           </div>
         </div>
 
@@ -319,7 +447,7 @@ export default function Dashboard({user, lessons: externalLessons = null, preloa
       </div>
 
       {selectedLesson && (
-        <div className="modal-overlay" onClick={()=>setSelectedLesson(null)}>
+        <div className="modal-overlay" onClick={()=>{setSelectedLesson(null); setIsModalReadOnly(false)}}>
           <div className="modal" onClick={(e)=>e.stopPropagation()}>
             <h3 style={{textAlign:'center',fontWeight:800}}>{selectedLesson.title}</h3>
             <p style={{lineHeight:1.6}}>{[selectedLesson.theme_name, selectedLesson.theme_description].filter(Boolean).join(' - ')}</p>
@@ -329,43 +457,54 @@ export default function Dashboard({user, lessons: externalLessons = null, preloa
               <div><span className="muted">Difficulty:</span> {selectedLesson.difficulty_level}</div>
             </div>
             {selectedLesson.download_url && (
-              <a href={selectedLesson.download_url} download target="_blank" rel="noopener noreferrer" style={{textDecoration:'none'}}>
+              <a href={selectedLesson.download_url} target="_blank" rel="noopener noreferrer" style={{textDecoration:'none'}}>
                 <button className="btn primary" style={{width:'100%',padding:10,marginBottom:12}}>Download Lesson Plan</button>
               </a>
             )}
-            <div style={{marginTop:12}}>
-              <label className="muted">Week</label>
-              <select id="weekSelect" defaultValue={currentWeek} style={{width:'100%',padding:8,borderRadius:8,marginTop:6}}>
-                {Array.from({length:WEEKS}).map((_,i)=> <option key={i} value={i+1}>Week {i+1}</option>)}
-              </select>
-            </div>
-            <div style={{display:'flex',gap:8,marginTop:8}}>
-              <div style={{flex:1}}>
-                <label className="muted">Day</label>
-                <select id="daySelect" style={{width:'100%',padding:8,borderRadius:8,marginTop:6}}>
-                  <option value={0}>Monday</option>
-                  <option value={1}>Tuesday</option>
-                  <option value={2}>Wednesday</option>
-                  <option value={3}>Thursday</option>
-                  <option value={4}>Friday</option>
-                </select>
-              </div>
-              <div style={{flex:1}}>
-                <label className="muted">Time slot</label>
-                <select id="slotSelect" style={{width:'100%',padding:8,borderRadius:8,marginTop:6}}>
-                  {slots.map((s,idx)=> <option key={idx} value={idx}>{s.label}</option>)}
-                </select>
-              </div>
-            </div>
+            
+            {!isModalReadOnly && (
+              <>
+                <div style={{marginTop:12}}>
+                  <label className="muted">Week</label>
+                  <select id="weekSelect" defaultValue={currentWeek} style={{width:'100%',padding:8,borderRadius:8,marginTop:6}}>
+                    {Array.from({length:WEEKS}).map((_,i)=> <option key={i} value={i+1}>Week {i+1}</option>)}
+                  </select>
+                </div>
+                <div style={{display:'flex',gap:8,marginTop:8}}>
+                  <div style={{flex:1}}>
+                    <label className="muted">Day</label>
+                    <select id="daySelect" style={{width:'100%',padding:8,borderRadius:8,marginTop:6}}>
+                      <option value={0}>Monday</option>
+                      <option value={1}>Tuesday</option>
+                      <option value={2}>Wednesday</option>
+                      <option value={3}>Thursday</option>
+                      <option value={4}>Friday</option>
+                    </select>
+                  </div>
+                  <div style={{flex:1}}>
+                    <label className="muted">Time slot</label>
+                    <select id="slotSelect" style={{width:'100%',padding:8,borderRadius:8,marginTop:6}}>
+                      {slots.map((s,idx)=> <option key={idx} value={idx}>{s.label}</option>)}
+                    </select>
+                  </div>
+                </div>
+              </>
+            )}
+            
             <div style={{display:'flex',gap:8,justifyContent:'flex-end',marginTop:20}}>
-              <button className="btn" onClick={()=>setSelectedLesson(null)}>Cancel</button>
-              <button className="btn primary" onClick={()=>{
-                const week = Number(document.getElementById('weekSelect').value)
-                const day = Number(document.getElementById('daySelect').value)
-                const slot = Number(document.getElementById('slotSelect').value)
-                addToCalendar(week,day,slot,selectedLesson.id)
-                setSelectedLesson(null)
-              }}>Add to calendar</button>
+              <button className="btn" onClick={()=>{setSelectedLesson(null); setIsModalReadOnly(false)}}>
+                {isModalReadOnly ? 'Close' : 'Cancel'}
+              </button>
+              {!isModalReadOnly && (
+                <button className="btn primary" onClick={()=>{
+                  const week = Number(document.getElementById('weekSelect').value)
+                  const day = Number(document.getElementById('daySelect').value)
+                  const slot = Number(document.getElementById('slotSelect').value)
+                  addToCalendar(week,day,slot,selectedLesson.id)
+                  setSelectedLesson(null)
+                  setIsModalReadOnly(false)
+                }}>Add to calendar</button>
+              )}
             </div>
           </div>
         </div>

@@ -6,6 +6,7 @@ import Users from './components/Users'
 import CourseDetail from './components/CourseDetail'
 import CreateScheme from './components/CreateScheme'
 import Notifications from './components/Notifications'
+import LessonLibrary from './components/LessonLibrary'
 
 const API_LOGIN_URL = '/api/login'
 const API_LESSONS_URL = '/api/lessons'
@@ -19,6 +20,7 @@ export default function App(){
   const [preloadedWeeks,setPreloadedWeeks] = useState(null)
   const [apiLessons,setApiLessons] = useState(null)
   const [apiLessonsLoading,setApiLessonsLoading] = useState(false)
+  const [myLessons,setMyLessons] = useState([])
   const [notifications,setNotifications] = useState([
     {id:1, title:'Approval requested', from:'Alice Johnson', date:'2026-01-27', comments:'Please review the scheme for cohort A', academyType:'Beginner'},
     {id:2, title:'New system alert', from:'System', date:'2026-01-28', comments:'Scheduled maintenance at 03:00 UTC', academyType:'N/A'}
@@ -120,7 +122,8 @@ export default function App(){
 
       {route==='login' && <Login onLogin={login} notice={loginNotice} clearNotice={()=>setLoginNotice('')} />}
       {route==='create-scheme' && <CreateScheme lessons={apiLessons} onCreate={(schemeMeta,weeks)=>{ setPreloadedScheme(schemeMeta); setPreloadedWeeks(weeks); location.hash='#dashboard' }} />}
-      {route==='dashboard' && <Dashboard user={user} lessons={apiLessons} preloadedScheme={preloadedScheme} weeksCount={preloadedWeeks} />}
+      {route==='dashboard' && <Dashboard user={user} lessons={apiLessons} preloadedScheme={preloadedScheme} weeksCount={preloadedWeeks} myLessons={myLessons} />}
+      {route==='lesson-library' && <LessonLibrary lessons={apiLessons} myLessons={myLessons} setMyLessons={setMyLessons} />}
       {route==='users' && <Users user={user} />}
       {route==='notifications' && <Notifications notifications={notifications} />}
       {route.startsWith('course-') && <CourseDetail />}

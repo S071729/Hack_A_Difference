@@ -72,10 +72,10 @@ label.muted{display:block;margin-bottom:6px;color:var(--muted);font-size:13px}
 .send-btn:hover{filter:brightness(.98)}
 
 .lessons{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;margin-top:18px}
-.lesson-card{min-width:220px;flex:0 0 auto;padding:14px;border-radius:12px;background:linear-gradient(180deg,#fff 0%, #fbfdff 100%);cursor:pointer;border:1px solid rgba(2,6,23,.04);box-shadow:0 8px 30px rgba(2,6,23,.04);display:flex;flex-direction:column;align-items:center;justify-content:center;aspect-ratio:1/1}
+.lesson-card{min-width:160px;flex:0 0 auto;padding:10px;border-radius:12px;background:linear-gradient(180deg,#fff 0%, #fbfdff 100%);cursor:pointer;border:1px solid rgba(2,6,23,.04);box-shadow:0 8px 30px rgba(2,6,23,.04);display:flex;flex-direction:column;align-items:center;justify-content:center;aspect-ratio:1/1}
 .lesson-card .box{flex:1;padding:8px;background:transparent;border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:center}
-.lesson-card .lesson-title{font-weight:700;text-align:center;font-size:16px}
-.lesson-card .muted{margin-top:8px;text-align:center}
+.lesson-card .lesson-title{font-weight:700;text-align:center;font-size:16px;line-height:1.3}
+.lesson-card .muted{margin-top:8px;text-align:center;overflow-wrap:break-word;word-wrap:break-word}
 
 .course-icon{width:48px;height:48px;border-radius:10px;background:linear-gradient(180deg,#efe6cf,#e0cfa0);display:flex;align-items:center;justify-content:center;font-weight:800;color:#6b4b1b;margin-bottom:10px}
 .lessons-carousel{display:flex;gap:16px;overflow-x:auto;scroll-behavior:smooth;padding:6px}
