@@ -30,9 +30,13 @@ export default function Notifications({notifications=[]}){
 
       <section className="blocks-grid">
         {blocks.map(b=> (
-          <div key={b.key} className="block" onClick={()=>{ if(b.key==='approvals'){ setSelectedApproval(approvals[0]||{placeholder:true}) } }}>
+          <button
+            key={b.key}
+            className="nav-btn block"
+            onClick={()=>{ if(b.key==='approvals'){ setSelectedApproval(approvals[0]||{placeholder:true}) } else { /* other blocks could navigate or open pages */ } }}
+          >
             <div className="block-title">{b.title}</div>
-          </div>
+          </button>
         ))}
       </section>
 
@@ -52,7 +56,7 @@ export default function Notifications({notifications=[]}){
             )}
 
             <div className="modal-actions">
-              <button onClick={()=>setSelectedApproval(null)}>Close</button>
+              <button className="nav-btn" onClick={()=>setSelectedApproval(null)}>Close</button>
             </div>
           </div>
         </div>
