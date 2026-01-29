@@ -24,7 +24,7 @@ export default function SearchFilter({onApply}){
   return (
     <div>
       <div style={{display:'flex',gap:8,marginTop:8}}>
-        <input placeholder="Search courses, keywords, or location" onChange={(e)=>setFilters(f=>({...f, q:e.target.value}))} style={{flex:1,padding:8,borderRadius:8,border:'1px solid #dfe6ea'}} />
+        <input placeholder="Search courses, keywords, or location" onChange={(e)=>{ const newFilters = {...filters, q:e.target.value}; setFilters(newFilters); if(onApply) onApply({filters: newFilters, uploaded: fileMeta}) }} style={{flex:1,padding:8,borderRadius:8,border:'1px solid #dfe6ea'}} />
         <button className="btn" onClick={()=>setOpen(true)}>Advanced Filters</button>
       </div>
 

@@ -1,5 +1,7 @@
 import React, {useState, useRef, useEffect} from 'react'
 import SearchFilter from './SearchFilter'
+import LessonCard from './LessonCard'
+import ActivityCard from './ActivityCard'
 
 export default function Dashboard({user, lessons: externalLessons = null, preloadedScheme = null, weeksCount = null}){
   const [lessons,setLessons] = useState(externalLessons || [])
@@ -10,21 +12,26 @@ export default function Dashboard({user, lessons: externalLessons = null, preloa
       setLessons(externalLessons)
     }
   },[externalLessons])
+  
+  // Calculate the starting ID for additional activities (after the max lesson ID)
+  const maxLessonId = lessons.length > 0 ? Math.max(...lessons.map(l => l.id)) : 0
+  const activityStartId = maxLessonId + 1
+  
   // additional activities (not part of recommended lessons)
   const additionalActivities = [
-    {id:101,title:'Football'},
-    {id:102,title:'Basketball'},
-    {id:103,title:'Volleyball'},
-    {id:104,title:'Handball'},
-    {id:105,title:'Dodgeball'},
-    {id:106,title:'Cricket'},
-    {id:107,title:'Table Tennis'},
-    {id:108,title:'Fitness'},
-    {id:109,title:'Yoga'},
-    {id:110,title:'Rock Climbing'},
-    {id:111,title:'Pilates'},
-    {id:112,title:'Gym'},
-    {id:113,title:'Walking'}
+    {id:activityStartId,title:'Football'},
+    {id:activityStartId+1,title:'Basketball'},
+    {id:activityStartId+2,title:'Volleyball'},
+    {id:activityStartId+3,title:'Handball'},
+    {id:activityStartId+4,title:'Dodgeball'},
+    {id:activityStartId+5,title:'Cricket'},
+    {id:activityStartId+6,title:'Table Tennis'},
+    {id:activityStartId+7,title:'Fitness'},
+    {id:activityStartId+8,title:'Yoga'},
+    {id:activityStartId+9,title:'Rock Climbing'},
+    {id:activityStartId+10,title:'Pilates'},
+    {id:activityStartId+11,title:'Gym'},
+    {id:activityStartId+12,title:'Walking'}
   ]
   const [searchTerm,setSearchTerm] = useState('')
   const combinedCatalog = [...lessons, ...additionalActivities]
@@ -201,7 +208,7 @@ export default function Dashboard({user, lessons: externalLessons = null, preloa
                             e.dataTransfer.setData('text/plain', String(id))
                           }}>
                             <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',gap:8}}>
-                              <div style={{flex:1}}>{(function(){ const id = assignments[`${currentWeek}-${c}-${ri}`]; return combinedCatalog.find(x=> x.id === id)?.title || 'Assigned' })()}</div>
+                              <div style={{flex:1}}>{(function(){ const id = assignments[`${currentWeek}-${c}-${ri}`]; const found = combinedCatalog.find(x=> x.id === id); return found?.lesson_title || found?.title || 'Assigned' })()}</div>
                               <button className="delete-assigned" onClick={(ev)=>{ ev.stopPropagation(); const key = `${currentWeek}-${c}-${ri}`; setAssignments(a=>{ const na = {...a}; delete na[key]; return na }) }}>✕</button>
                             </div>
                           </div>
@@ -263,38 +270,51 @@ export default function Dashboard({user, lessons: externalLessons = null, preloa
               </div>
             </div>
         </div>
-        {/* Additional learning: search + activities */}
+        {/* Lessons carousel with navigation */}
         <div style={{marginTop:18}}>
-          <h4 style={{marginBottom:8}}>Additional learning</h4>
+          <h4 style={{marginBottom:8}}>Recommended learning plans</h4>
           <SearchFilter onApply={(payload)=>{
-            // for now just log and show a small notice; payload contains filters and uploaded metadata
-            console.log('Applied filters:', payload)
-            alert('Filters applied (check console)')
+            setSearchTerm(payload.filters.q || '')
           }} />
-
-
-          <div className="lessons-carousel">
-            {combinedCatalog.filter(x=> x.id >= 100 && x.title.toLowerCase().includes(searchTerm.toLowerCase())).map(a=> (
-              <div key={a.id} className="lesson-card" draggable onDragStart={(e)=>onDragStart(e,a.id)} style={{minWidth:140}}>
-                <div className="course-icon">{a.title.split(' ').map(w=>w[0]).slice(0,2).join('')}</div>
-                <div className="lesson-title">{a.title}</div>
-              </div>
-            ))}
+          
+          <div style={{display:'flex',alignItems:'center',gap:8,marginTop:12}}>
+            <button className="carousel-arrow" onClick={()=>scrollLessons('left')}>◀</button>
+            <div className="lessons-carousel" ref={carouselRef}>
+              {lessons
+                .filter(l => {
+                  const searchLower = searchTerm.toLowerCase()
+                  return l.lesson_title.toLowerCase().includes(searchLower) || 
+                         (l.theme_name && l.theme_name.toLowerCase().includes(searchLower))
+                })
+                .slice(0, searchTerm ? undefined : 10)
+                .map(l=> (
+                <LessonCard 
+                  key={l.id} 
+                  lesson={l} 
+                  onClick={()=>setSelectedLesson(l)} 
+                  draggable 
+                  onDragStart={(e)=>onDragStart(e,l.id)}
+                />
+              ))}
+            </div>
+            <button className="carousel-arrow" onClick={()=>scrollLessons('right')}>▶</button>
           </div>
         </div>
 
-        <div style={{display:'flex',alignItems:'center',gap:8,marginTop:18}}>
-          <button className="carousel-arrow" onClick={()=>scrollLessons('left')}>◀</button>
-          <div className="lessons-carousel" ref={carouselRef}>
-            {lessons.map(l=> (
-              <div key={l.id} className="lesson-card" onClick={()=>setSelectedLesson(l)} draggable onDragStart={(e)=>onDragStart(e,l.id)}>
-                <div className="course-icon">{l.title.split(' ').map(w=>w[0]).slice(0,2).join('')}</div>
-                <div className="lesson-title">{l.title}</div>
-                <div className="muted small">{[l.theme_name, l.theme_description].filter(Boolean).join(' - ')}</div>
-              </div>
+        {/* Additional activities */}
+        <div style={{marginTop:18}}>
+          <h4 style={{marginBottom:8}}>Additional activities</h4>
+
+          <div className="lessons-carousel">
+            {additionalActivities.map(a=> (
+              <ActivityCard 
+                key={a.id} 
+                activity={a} 
+                draggable 
+                onDragStart={(e)=>onDragStart(e,a.id)}
+              />
             ))}
           </div>
-          <button className="carousel-arrow" onClick={()=>scrollLessons('right')}>▶</button>
         </div>
       </div>
 
@@ -303,6 +323,16 @@ export default function Dashboard({user, lessons: externalLessons = null, preloa
           <div className="modal" onClick={(e)=>e.stopPropagation()}>
             <h3 style={{textAlign:'center',fontWeight:800}}>{selectedLesson.title}</h3>
             <p style={{lineHeight:1.6}}>{[selectedLesson.theme_name, selectedLesson.theme_description].filter(Boolean).join(' - ')}</p>
+            <div style={{display:'flex',gap:16,marginTop:12,paddingBottom:12,borderBottom:'1px solid #eee',fontSize:14}}>
+              <div><span className="muted">Max Participants:</span> {selectedLesson.max_participants}</div>
+              <div><span className="muted">Duration:</span> {selectedLesson.duration_minutes} min</div>
+              <div><span className="muted">Difficulty:</span> {selectedLesson.difficulty_level}</div>
+            </div>
+            {selectedLesson.download_url && (
+              <a href={selectedLesson.download_url} download target="_blank" rel="noopener noreferrer" style={{textDecoration:'none'}}>
+                <button className="btn primary" style={{width:'100%',padding:10,marginBottom:12}}>Download Lesson Plan</button>
+              </a>
+            )}
             <div style={{marginTop:12}}>
               <label className="muted">Week</label>
               <select id="weekSelect" defaultValue={currentWeek} style={{width:'100%',padding:8,borderRadius:8,marginTop:6}}>
@@ -327,7 +357,7 @@ export default function Dashboard({user, lessons: externalLessons = null, preloa
                 </select>
               </div>
             </div>
-            <div style={{display:'flex',gap:8,justifyContent:'flex-end',marginTop:12}}>
+            <div style={{display:'flex',gap:8,justifyContent:'flex-end',marginTop:20}}>
               <button className="btn" onClick={()=>setSelectedLesson(null)}>Cancel</button>
               <button className="btn primary" onClick={()=>{
                 const week = Number(document.getElementById('weekSelect').value)
