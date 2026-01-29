@@ -122,7 +122,7 @@ export default function App(){
       {route==='create-scheme' && <CreateScheme lessons={apiLessons} onCreate={(schemeMeta,weeks)=>{ setPreloadedScheme(schemeMeta); setPreloadedWeeks(weeks); location.hash='#dashboard' }} />}
       {route==='dashboard' && <Dashboard user={user} lessons={apiLessons} preloadedScheme={preloadedScheme} weeksCount={preloadedWeeks} />}
       {route==='users' && <Users user={user} />}
-      {route==='notifications' && <Notifications notifications={notifications} />}
+      {route==='notifications' && <Notifications notifications={notifications} user={user} />}
       {route.startsWith('course-') && <CourseDetail />}
     </div>
   )
