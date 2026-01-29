@@ -127,4 +127,39 @@ label.muted{display:block;margin-bottom:6px;color:var(--muted);font-size:13px}
 .approval-detail{display:flex;flex-direction:column;gap:8px;margin-top:8px}
 .modal-actions{display:flex;justify-content:flex-end;margin-top:12px}
 
+/* Landing Page */
+.landing-btn{
+  background: var(--accent);
+  border: 1px solid rgba(2,6,23,.06);
+  border-radius: 12px;
+  padding: 24px 20px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(2,6,23,.04);
+}
+.landing-btn:hover{
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(2,6,23,.12);
+  border-color: rgba(2,6,23,.15);
+  filter: brightness(0.95);
+}
+.landing-icon{
+  font-size: 48px;
+  margin-bottom: 12px;
+}
+.landing-title{
+  font-weight: 700;
+  font-size: 18px;
+  color: #262e3c;
+  margin-bottom: 6px;
+}
+.landing-desc{
+  font-size: 13px;
+  color: #6b4b1b;
+  line-height: 1.4;
+}
 

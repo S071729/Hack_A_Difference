@@ -7,6 +7,7 @@ import CourseDetail from './components/CourseDetail'
 import CreateScheme from './components/CreateScheme'
 import Notifications from './components/Notifications'
 import LessonLibrary from './components/LessonLibrary'
+import LandingPage from './components/LandingPage'
 
 const API_LOGIN_URL = '/api/login'
 const API_LESSONS_URL = '/api/lessons'
@@ -97,8 +98,8 @@ export default function App(){
       }
       setUser({name:data.name,email:email,role:data.role})
       setLoginNotice('')
-      // navigate to Create Scheme immediately after login
-      location.hash = '#create-scheme'
+      // navigate to landing page after login
+      location.hash = '#home'
       return {ok:true}
     } catch (error) {
       console.error('Login error:', error)
@@ -121,6 +122,7 @@ export default function App(){
       <Header user={user} onSignout={signout} notifications={notifications} />
 
       {route==='login' && <Login onLogin={login} notice={loginNotice} clearNotice={()=>setLoginNotice('')} />}
+      {route==='home' && <LandingPage user={user} />}
       {route==='create-scheme' && <CreateScheme lessons={apiLessons} onCreate={(schemeMeta,weeks)=>{ setPreloadedScheme(schemeMeta); setPreloadedWeeks(weeks); location.hash='#dashboard' }} />}
       {route==='dashboard' && <Dashboard user={user} lessons={apiLessons} preloadedScheme={preloadedScheme} weeksCount={preloadedWeeks} myLessons={myLessons} />}
       {route==='lesson-library' && <LessonLibrary lessons={apiLessons} myLessons={myLessons} setMyLessons={setMyLessons} />}
