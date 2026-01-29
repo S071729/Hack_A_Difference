@@ -1,4 +1,5 @@
 import React, {useState, useRef, useEffect} from 'react'
+import SearchFilter from './SearchFilter'
 
 export default function Dashboard({user, lessons: externalLessons = null, preloadedScheme = null, weeksCount = null}){
   const [lessons,setLessons] = useState(externalLessons || [])
@@ -265,10 +266,12 @@ export default function Dashboard({user, lessons: externalLessons = null, preloa
         {/* Additional learning: search + activities */}
         <div style={{marginTop:18}}>
           <h4 style={{marginBottom:8}}>Additional learning</h4>
-          <div style={{display:'flex',gap:8,marginBottom:8}}>
-            <input placeholder="Search additional activities" value={searchTerm} onChange={e=>setSearchTerm(e.target.value)} style={{flex:1,padding:8,borderRadius:8,border:'1px solid #dfe6ea'}} />
-            <button className="btn" onClick={()=>setSearchTerm('')}>Clear</button>
-          </div>
+          <SearchFilter onApply={(payload)=>{
+            // for now just log and show a small notice; payload contains filters and uploaded metadata
+            console.log('Applied filters:', payload)
+            alert('Filters applied (check console)')
+          }} />
+
 
           <div className="lessons-carousel">
             {combinedCatalog.filter(x=> x.id >= 100 && x.title.toLowerCase().includes(searchTerm.toLowerCase())).map(a=> (

@@ -19,7 +19,7 @@ export default function Header({user,onSignout}){
                 setLogoSrc(fallbackSvg)
               }
             }} />
-          <div className="brand">Street League</div>
+          <div className="brand">Welcome to Shield</div>
         </div>
       </div>
 

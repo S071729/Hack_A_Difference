@@ -47,6 +47,9 @@ h1,h2,h3,h4,h5,h6{font-family:'Expert Sans','Montserrat',Segoe UI,Arial}
 .btn.primary{background:var(--accent);color:#fff}
 .muted{color:#bfc4c7;font-size:13px}
 .error{color:#b91c1c}
+ 
+input[type="text"], input[type="number"], input[type="file"], select { padding:10px;border:1px solid #e6eaed;border-radius:8px;width:100%;box-sizing:border-box }
+label.muted{display:block;margin-bottom:6px;color:var(--muted);font-size:13px}
 
 .calendar{overflow:auto;margin-top:8px}
 .calendar table{width:100%;border-collapse:collapse}
